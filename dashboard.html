@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>直播控場面板 (Dashboard)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f7;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        h2 { color: #1d1d1f; margin-bottom: 1.5rem; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #0077ed; }
+        #status { margin-top: 1rem; font-size: 0.8rem; color: #86868b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>控場控制台</h2>
+    <input type="text" id="nameInput" placeholder="請輸入新文字...">
+    <button id="updateBtn">立即更新畫面</button>
+    <p id="status">等待輸入...</p>
+</div>
+
+<script type="module">
+    // 引入 Firebase 必要的模組
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+    // 1. 貼上你的 Firebase 配置 (務必與 Overlay.html 相同)
+    const firebaseConfig = {
+        apiKey: "AIzaSyCYXg3U0_9X_N24sXoqsZrAlf6QclK8EcE",
+        authDomain: "rive-demo.firebaseapp.com",
+        databaseURL: "https://rive-demo-default-rtdb.firebaseio.com",
+        projectId: "rive-demo",
+        storageBucket: "rive-demo.firebasestorage.app",
+        messagingSenderId: "1063604174426",
+        appId: "1:1063604174426:web:ac1c1f2eb44bc27de12263"
+    };
+
+    // 初始化 Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const input = document.getElementById('nameInput');
+    const button = document.getElementById('updateBtn');
+    const status = document.getElementById('status');
+
+    // 2. 點擊按鈕後，將資料發送到 Firebase
+    button.addEventListener('click', () => {
+        const newValue = input.value;
+        
+        if (newValue.trim() !== "") {
+            status.innerText = "傳送中...";
+            
+            // 使用 set 指令更新路徑為 'name' 的資料
+            set(ref(db, 'name'), newValue)
+                .then(() => {
+                    status.innerText = "成功更新資料庫！";
+                    input.value = ""; // 清空輸入框以便下次輸入
+                    setTimeout(() => { status.innerText = "等待輸入..."; }, 2000);
+                })
+                .catch((error) => {
+                    status.innerText = "更新失敗: " + error.message;
+                });
+        }
+    });
+
+    // 支援按下 Enter 鍵發送
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') button.click();
+    });
+</script>
+
+</body>
+</html>
