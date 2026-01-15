@@ -33,8 +33,38 @@
   <!-- 3. Canvas placeholder -->
   <canvas id="rive-canvas" width="400" height="400"></canvas>
 
-  <!-- 4. Initialise Rive -->
-  <script>
+  <!-- 4. Initialise -->
+  <script type="module">
+
+
+
+
+
+    // 引入 Firebase 必要的模組
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+    // 貼上你的 Firebase 配置
+    const firebaseConfig = {
+          apiKey: "AIzaSyCYXg3U0_9X_N24sXoqsZrAlf6QclK8EcE",
+          authDomain: "rive-demo.firebaseapp.com",
+          databaseURL: "https://rive-demo-default-rtdb.firebaseio.com",
+          projectId: "rive-demo",
+          storageBucket: "rive-demo.firebasestorage.app",
+          messagingSenderId: "1063604174426",
+          appId: "1:1063604174426:web:ac1c1f2eb44bc27de12263"
+    };
+
+    // 初始化 Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+
+
+
+
+
+    // Initialise Rive
     const r = new rive.Rive({
       src: 'button.riv',
       canvas: document.getElementById('rive-canvas'),
@@ -45,12 +75,46 @@
 
       onLoad: () => {
 
-        const vmi = r.viewModelInstance
-        vmi.string('txt').value = 'Fuck'
+        //const vmi = r.viewModelInstance
+        //vmi.string('txt').value = 'Fuck'
 
         r.resizeDrawingSurfaceToCanvas()
+        startListening();
       }
     });
+
+
+
+
+
+    // --- 監聽 Firebase 並對接 ---
+    function startListening() {
+        const dataRef = ref(db, 'name'); // 監聽你在 Firebase 建立的那個 Key
+
+        onValue(dataRef, (snapshot) => {
+            const newName = snapshot.val();
+            if (newName) {
+                const vmi = r.viewModelInstance;
+                vmi.string('txt').value = newName;
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // Keep things sharp if the window is resized
