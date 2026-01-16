@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Rive Button</title>
+  <title>Rive Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- 1. Page-level styling -->
@@ -36,6 +36,41 @@
   <!-- 4. Initialise -->
   <script type="module">
 
+    // Initialise Rive
+    const r = new rive.Rive({
+      src: 'scoreBoard.riv',
+      canvas: document.getElementById('rive-canvas'),
+      autoplay: true,
+      autoBind: true,
+      artboard: 'Artboard', 
+      stateMachines: 'State Machine 1',
+
+      onLoad: () => {
+/*
+        const vmi = r.viewModelInstance;
+        const ins1 = vmi.viewModel('property of View Model 1');
+        ins1.string('String property').value = 'Levi';
+        ins1.number('Number property').value = 500;
+*/
+
+        startListening();
+        r.resizeDrawingSurfaceToCanvas()
+      }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -61,41 +96,25 @@
 
 
 
-
-
-
-    // Initialise Rive
-    const r = new rive.Rive({
-      src: 'button.riv',
-      canvas: document.getElementById('rive-canvas'),
-      autoplay: true,
-      autoBind: true,
-      artboard: 'Artboard', 
-      stateMachines: 'State Machine 1',
-
-      onLoad: () => {
-
-        //const vmi = r.viewModelInstance
-        //vmi.string('txt').value = 'Fuck'
-
-        r.resizeDrawingSurfaceToCanvas()
-        startListening();
-      }
-    });
-
-
-
-
-
     // --- 監聽 Firebase 並對接 ---
     function startListening() {
-        const dataRef = ref(db, 'name'); // 監聽你在 Firebase 建立的那個 Key
+        const nameDataRef = ref(db, 'name'); // 監聽你在 Firebase 建立的那個 Key
+        const scoreDataRef = ref(db, 'score'); // 監聽你在 Firebase 建立的那個 Key
 
-        onValue(dataRef, (snapshot) => {
+        onValue(nameDataRef, (snapshot) => {
             const newName = snapshot.val();
             if (newName) {
                 const vmi = r.viewModelInstance;
-                vmi.string('txt').value = newName;
+                const ins1 = vmi.viewModel('property of View Model 1');
+                ins1.string('String property').value = newName;
+            }
+        });
+        onValue(scoreDataRef, (snapshot) => {
+            const newScore = snapshot.val();
+            if (newScore != null) {
+                const vmi = r.viewModelInstance;
+                const ins1 = vmi.viewModel('property of View Model 1');
+                ins1.number('Number property').value = newScore;
             }
         });
     }
